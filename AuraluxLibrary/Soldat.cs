@@ -6,15 +6,9 @@ using System.Threading.Tasks;
 
 namespace AuraluxLibrary
 {
-	public class Planet : EventEntiy
-	{
-		public int Rayon
-		{
-			get;set;
-		}
-		public Planet(string id, int rayon) : base(id)
-		{
-			Rayon = rayon;
-		}
+	public class Soldat
+	{	
+		public int vitesse { get; set; }
+		
 	}
 }
