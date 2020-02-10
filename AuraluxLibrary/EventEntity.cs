@@ -72,7 +72,7 @@ namespace AuraluxLibrary
 		}
 		public int MaxNiveauDeSanté { get; private set; } //Le niveau de santé maximal selon le niveau de la planète
 		public bool Conquérable { get; private set; }  //Est-ce que la planète est conquérable ou non?
-		public int NbDeSoldatsPourConquérir { get { return NbDeSoldatsPourConquérir; } set { NbDeSoldatsPourConquérir = NbDeSoldats; } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
+		public int NbDeSoldatsPourConquérir { get { return NbDeSoldatsPourConquérir; } set { NbDeSoldatsPourConquérir = NbDeSoldats+ (int)(NbDeSoldats/3); } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
 		private int NbPoint { get; set; }  //Le nombre de point actuel
 		public int NiveauActuel //Le niveau actuel
 		{
@@ -123,7 +123,7 @@ namespace AuraluxLibrary
 			{ Message = "Il faut se défendre", nbSoldatsPourLaDéfense = nombreDeSoldatsPourDéfense });
 		}
 
-		public EventEntiy(string id )
+		public EventEntiy(string id)
 		{
 			Id = id;
 			SeFaitAttaquer = false;
