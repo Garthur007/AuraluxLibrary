@@ -9,7 +9,8 @@ namespace AuraluxLibrary
 	public class GénérerSoldatsArgs : EventArgs
 	{
 		public string Message { get; set; }
-		public int nbSoldatsActuel { get; set; }
+		public int nbTotalDeSoldat { get; set; }
+		public int nbNouveauxSoldats { get; set; }
 	}
 	public class AttaquerArgs : EventArgs
 	{
@@ -42,22 +43,24 @@ namespace AuraluxLibrary
 		public string Id { get; private set; } //Le id de la planète
 
 		public string IdDuPropriétaire { get; set; }
-		public int NiveauDeSanté
-		{
-			get { return NiveauDeSanté; }
-			set
-			{
-				if (value <= 0)
-					this.EstNeutre = true;
-				NiveauDeSanté = value;
 
-			}
-		}
+		public int NiveauDeSanté { get; set; }
+		//public int NiveauDeSanté
+		//{
+		//	get { return NiveauDeSanté; }
+		//	set
+		//	{
+		//		if (value <= 0)
+		//			this.EstNeutre = true;
+		//		NiveauDeSanté = value;
+
+		//	}
+		//}
 		public string JoueurEnContrôle { get; private set; } //Le nom ou le id du jouer qui contrôle la planète
 		public int NbDeSoldats
 		{
 			get { return NbDeSoldats; }
-			private set
+			set
 			{
 				NbDeSoldats = value;
 			}
@@ -89,9 +92,10 @@ namespace AuraluxLibrary
 
 		public void GénérerSoldats()
 		{
+			int temp = NbDeSoldats;
 			NbDeSoldats += NbDeSoldatParGénération;
 			OnNBSoldatsChanged?.Invoke(this, new GénérerSoldatsArgs()
-			{ Message = "Nouvelle Génération", nbSoldatsActuel = NbDeSoldats });
+			{ Message = "Nouvelle Génération", nbTotalDeSoldat = NbDeSoldats, nbNouveauxSoldats = NbDeSoldats - temp });
 		}
 
 
@@ -125,10 +129,12 @@ namespace AuraluxLibrary
 
 		public EventEntiy(string id)
 		{
+			
 			Id = id;
 			SeFaitAttaquer = false;
 			Conquérable = true;
 			NiveauDeSanté = 100;
+
 		}
 		
 		public void Reset()
