@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace AuraluxLibrary
 {
-	public class Planet : EventEntiy
+	public class Planète : EventEntiy
 	{
 		public int Rayon
 		{
 			get;set;
 		}
-		public Planet(string id, int rayon) : base(id)
+		public Planète(string id, int rayon) : base(id)
 		{
+			
 			Rayon = rayon;
 		}
 	}
