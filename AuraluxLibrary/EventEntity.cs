@@ -123,7 +123,7 @@ namespace AuraluxLibrary
 			{ Message = "Il faut se défendre", nbSoldatsPourLaDéfense = nombreDeSoldatsPourDéfense });
 		}
 
-		public EventEntiy(string id )
+		public EventEntiy(string id)
 		{
 			Id = id;
 			SeFaitAttaquer = false;
