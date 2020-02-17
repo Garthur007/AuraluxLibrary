@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuraluxLibrary
 {
-	public class GénérerSoldatsArgs : EventArgs
+	public class GénérerSoldatsArgs 
 	{
 		public string Message { get; set; }
 		public int nbTotalDeSoldat { get; set; }
@@ -57,20 +57,26 @@ namespace AuraluxLibrary
 		//	}
 		//}
 		public string JoueurEnContrôle { get; private set; } //Le nom ou le id du jouer qui contrôle la planète
+		int nbSoldats;
 		public int NbDeSoldats
 		{
-			get { return NbDeSoldats; }
+			get { return nbSoldats; }
 			set
 			{
-				NbDeSoldats = value;
+				int temp = nbSoldats;
+				nbSoldats = value;
+				OnNBSoldatsChanged?.Invoke(this, new GénérerSoldatsArgs()
+				{ Message = "Nouvelle Génération", nbTotalDeSoldat = nbSoldats, nbNouveauxSoldats = nbSoldats - temp });
 			}
 		}
+		int nbDeSoldatParGénération;
+		
 		private int NbDeSoldatParGénération
 		{
-			get { return NbDeSoldatParGénération; }
+			get { return nbDeSoldatParGénération; }
 			set
 			{
-				NbDeSoldatParGénération = (NiveauActuel + 1) * 10;
+				nbDeSoldatParGénération = (NiveauActuel + 1) * 10;
 			}
 		}
 		public int MaxNiveauDeSanté { get; private set; } //Le niveau de santé maximal selon le niveau de la planète
@@ -92,10 +98,7 @@ namespace AuraluxLibrary
 
 		public void GénérerSoldats()
 		{
-			int temp = NbDeSoldats;
 			NbDeSoldats += NbDeSoldatParGénération;
-			OnNBSoldatsChanged?.Invoke(this, new GénérerSoldatsArgs()
-			{ Message = "Nouvelle Génération", nbTotalDeSoldat = NbDeSoldats, nbNouveauxSoldats = NbDeSoldats - temp });
 		}
 
 
@@ -132,6 +135,7 @@ namespace AuraluxLibrary
 			
 			Id = id;
 			SeFaitAttaquer = false;
+			nbDeSoldatParGénération = 5;
 			Conquérable = true;
 			NiveauDeSanté = 100;
 
