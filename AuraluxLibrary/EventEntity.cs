@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuraluxLibrary
 {
-	public class GénérerSoldatsArgs : EventArgs
+	public class GénérerSoldatsArgs 
 	{
 		public string Message { get; set; }
 		public int nbTotalDeSoldat { get; set; }
@@ -92,12 +92,14 @@ namespace AuraluxLibrary
 				{ Message = "Nouvelle Génération", nbTotalDeSoldat = nbDeSoldats, nbNouveauxSoldats = nbDeSoldats - temp });
 			}
 		}
+		int nbDeSoldatParGénération;
+		
 		private int NbDeSoldatParGénération
 		{
 			get { return nbDeSoldatParGénération; }
 			set
 			{
-				nbDeSoldatParGénération = value;
+				nbDeSoldatParGénération = (NiveauActuel + 1) * 10;
 			}
 		}
 
@@ -121,9 +123,7 @@ namespace AuraluxLibrary
 
 		public void GénérerSoldats()
 		{
-
 			NbDeSoldats += NbDeSoldatParGénération;
-
 		}
 
 
@@ -160,6 +160,7 @@ namespace AuraluxLibrary
 
 			Id = id;
 			SeFaitAttaquer = false;
+			nbDeSoldatParGénération = 5;
 			Conquérable = true;
 			NiveauDeSanté = 100;
 			NbDeSoldatParGénération = 10;
