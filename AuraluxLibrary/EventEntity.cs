@@ -36,10 +36,12 @@ namespace AuraluxLibrary
 		public EventHandler<DefenseArgs> OnDefense;
 		public EventHandler<UpradeLevelArgs> OnUpdrade;
 
-
-
-		public bool EstNeutre { get; set; }
-		public bool SeFaitAttaquer { get; set; }
+		public bool estNeutre;
+		public bool seFaitAttaquer;
+		public bool isConquered;
+		public bool IsConquered { get { return isConquered; } set { isConquered = value; } }
+		public bool EstNeutre { get {return estNeutre ; } set { estNeutre = value; } }
+		public bool SeFaitAttaquer { get { return seFaitAttaquer; } set { seFaitAttaquer=value; } }
 		public string Id { get; private set; } //Le id de la planète
 
 		public string IdDuPropriétaire { get; set; }
@@ -138,15 +140,26 @@ namespace AuraluxLibrary
 			nbDeSoldatParGénération = 5;
 			Conquérable = true;
 			NiveauDeSanté = 100;
-
+			isConquered = false;
 		}
-		
+
 		public void Reset()
 		{
 			Conquérable = true;
 			SeFaitAttaquer = false;
 			NbDeSoldats = 0;
 			EstNeutre = true;
+			isConquered = false;
+		}
+		public void Set()
+		{
+			SeFaitAttaquer = false;
+			nbDeSoldatParGénération = 5;
+			Conquérable = true;
+			NiveauDeSanté = 100;
+			EstNeutre = false;
+			isConquered = true;
+			
 		}
 		public void ToggleConquérable() => Conquérable = !Conquérable;
 
