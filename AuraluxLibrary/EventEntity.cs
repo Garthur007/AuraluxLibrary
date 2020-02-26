@@ -27,6 +27,10 @@ namespace AuraluxLibrary
 		public string Message { get; set; }
 		public int nouveauNiveau { get; set; }
 	}
+	public class NeutreArgs
+	{
+		public string Message { get; set; }
+	}
 
 	public abstract class EventEntiy
 	{
@@ -35,75 +39,99 @@ namespace AuraluxLibrary
 		public EventHandler<AttaquerArgs> OnAttack;
 		public EventHandler<DefenseArgs> OnDefense;
 		public EventHandler<UpradeLevelArgs> OnUpdrade;
+		public EventHandler<NeutreArgs> OnDevientNeutre;
 
 
 
-		public bool EstNeutre { get; set; }
-		public bool SeFaitAttaquer { get; set; }
-		public string Id { get; private set; } //Le id de la planète
+		public bool estNeutre;
+		public bool seFaitAttaquer;
+		public bool conquérable;
+		public string id;
+		public string idDuPropriétaire;
+		public int niveauDeSanté;
+		public int nbDeSoldats;
+		public int nbDeSoldatParGénération;
+		public int maxNiveauDeSanté;
+		public int nbDeSoldatsPourConquérir;
+		public int nbPts;
+		public int niveauActuel;
+		public int nbDePtsAvantProchainNiveau;
+		public int niveauMax;
 
-		public string IdDuPropriétaire { get; set; }
 
-		public int NiveauDeSanté { get; set; }
-		//public int NiveauDeSanté
-		//{
-		//	get { return NiveauDeSanté; }
-		//	set
-		//	{
-		//		if (value <= 0)
-		//			this.EstNeutre = true;
-		//		NiveauDeSanté = value;
-
-		//	}
-		//}
-		public string JoueurEnContrôle { get; private set; } //Le nom ou le id du jouer qui contrôle la planète
-		public int NbDeSoldats
+		public bool EstNeutre
 		{
-			get { return NbDeSoldats; }
+			get { return estNeutre; }
+			set { estNeutre = value; OnDevientNeutre?.Invoke(this, new NeutreArgs() { Message = "Je suis neutre" }); }
+		}
+		public bool SeFaitAttaquer { get { return seFaitAttaquer; } set { seFaitAttaquer = value; } }
+		public string Id { get { return id; } private set { id = value; } } //Le id de la planète
+
+		public string JoueurEnContrôle { get { return idDuPropriétaire; } set { idDuPropriétaire = value; } }
+
+
+		public int NiveauDeSanté
+		{
+			get { return niveauDeSanté; }
 			set
 			{
-				NbDeSoldats = value;
+				if (value <= 0)
+					this.EstNeutre = true;
+				niveauDeSanté = value;
+
+			}
+		}
+		public int NbDeSoldats
+		{
+			get { return nbDeSoldats; }
+			set
+			{
+				int temp = nbDeSoldats;
+				nbDeSoldats = value;
+				OnNBSoldatsChanged?.Invoke(this, new GénérerSoldatsArgs()
+				{ Message = "Nouvelle Génération", nbTotalDeSoldat = nbDeSoldats, nbNouveauxSoldats = nbDeSoldats - temp });
 			}
 		}
 		private int NbDeSoldatParGénération
 		{
-			get { return NbDeSoldatParGénération; }
+			get { return nbDeSoldatParGénération; }
 			set
 			{
-				NbDeSoldatParGénération = (NiveauActuel + 1) * 10;
+				nbDeSoldatParGénération = value;
 			}
 		}
-		public int MaxNiveauDeSanté { get; private set; } //Le niveau de santé maximal selon le niveau de la planète
-		public bool Conquérable { get; private set; }  //Est-ce que la planète est conquérable ou non?
-		public int NbDeSoldatsPourConquérir { get { return NbDeSoldatsPourConquérir; } set { NbDeSoldatsPourConquérir = NbDeSoldats+ (int)(NbDeSoldats/3); } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
-		private int NbPoint { get; set; }  //Le nombre de point actuel
+
+
+		public int MaxNiveauDeSanté { get { return maxNiveauDeSanté; } private set { maxNiveauDeSanté = value; } } //Le niveau de santé maximal selon le niveau de la planète
+		public bool Conquérable { get { return conquérable; } private set { conquérable = value; } }  //Est-ce que la planète est conquérable ou non?
+		public int NbDeSoldatsPourConquérir { get { return nbDeSoldatsPourConquérir; } set { nbDeSoldatsPourConquérir = NbDeSoldats + (int)(NbDeSoldats / 3); } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
+		private int NbPoint { get { return nbPts; } set { nbPts = value; } }  //Le nombre de point actuel
 		public int NiveauActuel //Le niveau actuel
 		{
-			get { return NiveauActuel; }
+			get { return niveauActuel; }
 			set
 			{
-				NiveauActuel = value;
+				niveauActuel = value;
 
 			}
 
 		}
-		private int NbDePtsAvantProchainNiveau { get; set; } //Le nombre de points avant d'atteindre le prochain niveau
-		private int NiveauMax { get { return NiveauMax; } set { NiveauMax = 3; } } //Le niveau maximal
+		private int NbDePtsAvantProchainNiveau { get { return nbDePtsAvantProchainNiveau; } set { NbDePtsAvantProchainNiveau = value; } } //Le nombre de points avant d'atteindre le prochain niveau
+		private int NiveauMax { get { return niveauMax; } set { niveauMax = 3; } } //Le niveau maximal
 
 		public void GénérerSoldats()
 		{
-			int temp = NbDeSoldats;
+
 			NbDeSoldats += NbDeSoldatParGénération;
-			OnNBSoldatsChanged?.Invoke(this, new GénérerSoldatsArgs()
-			{ Message = "Nouvelle Génération", nbTotalDeSoldat = NbDeSoldats, nbNouveauxSoldats = NbDeSoldats - temp });
+
 		}
 
 
 		//Méthode pour incrémenter de niveau
 		//Cette méthode s'assure que le niveau actuel ne dépasse pas le niveau maximal
-		public void IncrémenterNiveau() 
+		public void IncrémenterNiveau()
 		{
-			NiveauActuel = NiveauActuel<NiveauMax? NiveauActuel + 1 : NiveauActuel;
+			NiveauActuel = NiveauActuel < NiveauMax ? NiveauActuel + 1 : NiveauActuel;
 			OnUpdrade?.Invoke(this, new UpradeLevelArgs() { Message = "Niveau supérieur", nouveauNiveau = NiveauActuel });
 		}
 
@@ -111,7 +139,7 @@ namespace AuraluxLibrary
 
 		//Cette méthode est pour attaquer avec tous nos soldats
 		public void AttaquerAvecTousNosSoldats() => Attaquer(NbDeSoldats);
-	
+
 		//On appelle cette méthode lorsqu'une planète doit se séparer de certains soldat
 		public void Attaquer(int nombreDeSoldatsPourAtq)
 		{
@@ -123,28 +151,28 @@ namespace AuraluxLibrary
 		public void Défendre(int nombreDeSoldatsPourDéfense)
 		{
 			NbDeSoldats -= nombreDeSoldatsPourDéfense;
-			OnDefense?.Invoke(this, new DefenseArgs() 
+			OnDefense?.Invoke(this, new DefenseArgs()
 			{ Message = "Il faut se défendre", nbSoldatsPourLaDéfense = nombreDeSoldatsPourDéfense });
 		}
 
 		public EventEntiy(string id)
 		{
-			
+
 			Id = id;
 			SeFaitAttaquer = false;
 			Conquérable = true;
 			NiveauDeSanté = 100;
-
+			NbDeSoldatParGénération = 10;
 		}
-		
+
 		public void Reset()
 		{
 			Conquérable = true;
 			SeFaitAttaquer = false;
 			NbDeSoldats = 0;
-			EstNeutre = true;
+			NbDeSoldatParGénération = 0;
 		}
 		public void ToggleConquérable() => Conquérable = !Conquérable;
-
+		
     }
 }
