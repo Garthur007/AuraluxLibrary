@@ -93,7 +93,7 @@ namespace AuraluxLibrary
 				{ Message = "Nouvelle Génération", nbTotalDeSoldat = nbDeSoldats, nbNouveauxSoldats = nbDeSoldats - temp });
 			}
 		}
-		int nbDeSoldatParGénération;
+		
 		
 		private int NbDeSoldatParGénération
 		{
@@ -124,7 +124,8 @@ namespace AuraluxLibrary
 
 		public void GénérerSoldats()
 		{
-			NbDeSoldats += NbDeSoldatParGénération;
+			if(!estNeutre)
+				NbDeSoldats += NbDeSoldatParGénération;
 		}
 
 
@@ -156,15 +157,14 @@ namespace AuraluxLibrary
 			{ Message = "Il faut se défendre", nbSoldatsPourLaDéfense = nombreDeSoldatsPourDéfense });
 		}
 
-		public EventEntiy(string id)
+		public EventEntiy()
 		{
 
-			Id = id;
+			
 			SeFaitAttaquer = false;
 			nbDeSoldatParGénération = 5;
 			Conquérable = true;
 			NiveauDeSanté = 100;
-			isConquered = false;
 
 			NbDeSoldatParGénération = 10;
 
@@ -176,7 +176,7 @@ namespace AuraluxLibrary
 			SeFaitAttaquer = false;
 			NbDeSoldats = 0;
 			EstNeutre = true;
-			isConquered = false;
+			
 		}
 		public void Set()
 		{
@@ -185,8 +185,6 @@ namespace AuraluxLibrary
 			Conquérable = true;
 			NiveauDeSanté = 100;
 			EstNeutre = false;
-			isConquered = true;
-			
 			NbDeSoldatParGénération = 0;
 
 		}

@@ -16,9 +16,9 @@ namespace AuraluxLibrary
 		{
 			get;set;
 		}
-		public Planète(string id, int rayon) : base(id)
+		public Planète() : base()
 		{
-			Rayon = rayon;
+			
 		}
 	}
 }
