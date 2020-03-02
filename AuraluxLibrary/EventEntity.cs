@@ -105,7 +105,7 @@ namespace AuraluxLibrary
 		}
 
 
-		public int MaxNiveauDeSanté { get { return maxNiveauDeSanté; } private set { maxNiveauDeSanté = value; } } //Le niveau de santé maximal selon le niveau de la planète
+		public int MaxNiveauDeSanté { get { return maxNiveauDeSanté; } private set { maxNiveauDeSanté = value * (niveauActuel+1); } } //Le niveau de santé maximal selon le niveau de la planète
 		public bool Conquérable { get { return conquérable; } private set { conquérable = value; } }  //Est-ce que la planète est conquérable ou non?
 		public int NbDeSoldatsPourConquérir { get { return nbDeSoldatsPourConquérir; } set { nbDeSoldatsPourConquérir = NbDeSoldats + (int)(NbDeSoldats / 3); } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
 		private int NbPoint { get { return nbPts; } set { nbPts = value; } }  //Le nombre de point actuel
@@ -115,7 +115,6 @@ namespace AuraluxLibrary
 			set
 			{
 				niveauActuel = value;
-
 			}
 
 		}
@@ -133,10 +132,25 @@ namespace AuraluxLibrary
 		//Cette méthode s'assure que le niveau actuel ne dépasse pas le niveau maximal
 		public void IncrémenterNiveau()
 		{
+			nbDePtsAvantProchainNiveau *= (niveauActuel + 2)* 500;
 			NiveauActuel = NiveauActuel < NiveauMax ? NiveauActuel + 1 : NiveauActuel;
 			OnUpdrade?.Invoke(this, new UpradeLevelArgs() { Message = "Niveau supérieur", nouveauNiveau = NiveauActuel });
 		}
+		public void AutoGuérison()
+		{
+			if(niveauDeSanté < maxNiveauDeSanté)
+			{
+				niveauDeSanté++;
+			}else if (nbDePtsAvantProchainNiveau > 0)
+			{
+				nbDePtsAvantProchainNiveau--;
+			}
+			else
+			{
 
+				IncrémenterNiveau();
+			}
+		}
 
 
 		//Cette méthode est pour attaquer avec tous nos soldats
@@ -164,9 +178,10 @@ namespace AuraluxLibrary
 			SeFaitAttaquer = false;
 			nbDeSoldatParGénération = 5;
 			Conquérable = true;
-			NiveauDeSanté = 100;
-
-			NbDeSoldatParGénération = 10;
+			NiveauDeSanté = 1000;
+			maxNiveauDeSanté = 1000;
+			niveauActuel = 0;
+			nbDePtsAvantProchainNiveau = 500;
 
 		}
 
