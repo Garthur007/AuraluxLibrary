@@ -132,7 +132,7 @@ namespace AuraluxLibrary
 		//Cette méthode s'assure que le niveau actuel ne dépasse pas le niveau maximal
 		public void IncrémenterNiveau()
 		{
-			nbDePtsAvantProchainNiveau *= (niveauActuel + 2)* 500;
+			nbDePtsAvantProchainNiveau += (niveauActuel + 2)* 500;
 			NiveauActuel = NiveauActuel < NiveauMax ? NiveauActuel + 1 : NiveauActuel;
 			OnUpdrade?.Invoke(this, new UpradeLevelArgs() { Message = "Niveau supérieur", nouveauNiveau = NiveauActuel });
 		}
@@ -147,7 +147,6 @@ namespace AuraluxLibrary
 			}
 			else
 			{
-
 				IncrémenterNiveau();
 			}
 		}
