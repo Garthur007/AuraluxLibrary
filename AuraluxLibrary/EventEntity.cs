@@ -20,7 +20,7 @@ namespace AuraluxLibrary
 	public class DefenseArgs : EventArgs
 	{
 		public string Message { get; set; }
-		public int nbSoldatsPourLaDéfense { get; set; }
+		public int NiveauDeSanté { get; set; }
 	}
 	public class UpradeLevelArgs : EventArgs
 	{
@@ -77,7 +77,14 @@ namespace AuraluxLibrary
 			set
 			{
 				if (value <= 0)
-					this.EstNeutre = true;
+				{
+					if (!EstNeutre)
+					{
+						EstNeutre = true;
+						OnDevientNeutre?.Invoke(this, new NeutreArgs()
+						{ Message = "On est devenue neutre" });
+					}
+				}
 				niveauDeSanté = value;
 
 			}
@@ -163,11 +170,13 @@ namespace AuraluxLibrary
 			{ Message = "Debut d'une attaque", nbSoldatsPourAtq = nombreDeSoldatsPourAtq });
 		}
 
-		public void Défendre(int nombreDeSoldatsPourDéfense)
+		public void Défendre(int ptsDeVie)
 		{
-			NbDeSoldats -= nombreDeSoldatsPourDéfense;
+			nbDeSoldats -= 1;
+			if(nbDeSoldats==0)
+				NiveauDeSanté -= ptsDeVie;
 			OnDefense?.Invoke(this, new DefenseArgs()
-			{ Message = "Il faut se défendre", nbSoldatsPourLaDéfense = nombreDeSoldatsPourDéfense });
+			{ Message = "Il faut se défendre", NiveauDeSanté = NiveauDeSanté });
 		}
 
 		public EventEntiy()
@@ -177,7 +186,7 @@ namespace AuraluxLibrary
 			SeFaitAttaquer = false;
 			nbDeSoldatParGénération = 5;
 			Conquérable = true;
-			NiveauDeSanté = 1000;
+			NiveauDeSanté = 50;
 			maxNiveauDeSanté = 1000;
 			niveauActuel = 0;
 			nbDePtsAvantProchainNiveau = 500;
