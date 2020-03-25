@@ -42,7 +42,7 @@ namespace AuraluxLibrary
 		public EventHandler<NeutreArgs> OnDevientNeutre;
 
 
-
+	
 		public bool estNeutre;
 		public bool seFaitAttaquer;
 		public bool conquérable;
@@ -66,7 +66,7 @@ namespace AuraluxLibrary
 			set { estNeutre = value; OnDevientNeutre?.Invoke(this, new NeutreArgs() { Message = "Je suis neutre" }); }
 		}
 		public bool SeFaitAttaquer { get { return seFaitAttaquer; } set { seFaitAttaquer = value; } }
-		public string Id { get { return id; } private set { id = value; } } //Le id de la planète
+		public string Id { get { return id; }  set { id = value; } } //Le id de la planète
 
 		public string JoueurEnContrôle { get { return idDuPropriétaire; } set { idDuPropriétaire = value; } }
 
@@ -114,7 +114,7 @@ namespace AuraluxLibrary
 
 		public int MaxNiveauDeSanté { get { return maxNiveauDeSanté; } private set { maxNiveauDeSanté = value * (niveauActuel+1); } } //Le niveau de santé maximal selon le niveau de la planète
 		public bool Conquérable { get { return conquérable; } private set { conquérable = value; } }  //Est-ce que la planète est conquérable ou non?
-		public int NbDeSoldatsPourConquérir { get { return nbDeSoldatsPourConquérir; } set { nbDeSoldatsPourConquérir = NbDeSoldats + (int)(NbDeSoldats / 3); } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
+		public int NbDeSoldatsPourConquérir { get { return nbDeSoldatsPourConquérir; } set { nbDeSoldatsPourConquérir = value; } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
 		private int NbPoint { get { return nbPts; } set { nbPts = value; } }  //Le nombre de point actuel
 		public int NiveauActuel //Le niveau actuel
 		{
@@ -186,10 +186,10 @@ namespace AuraluxLibrary
 			SeFaitAttaquer = false;
 			nbDeSoldatParGénération = 5;
 			Conquérable = true;
-			NiveauDeSanté = 50;
-			maxNiveauDeSanté = 1000;
+			NiveauDeSanté = 100;
+			maxNiveauDeSanté = 100;
 			niveauActuel = 0;
-			nbDePtsAvantProchainNiveau = 500;
+			nbDePtsAvantProchainNiveau = 200;
 
 		}
 
