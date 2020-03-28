@@ -29,7 +29,7 @@ namespace AuraluxLibrary
 			joueurLancantAtq = IdAttaquant;
 			Objectif = IdObjectif;
 			NombreDeUnits = nbs;
-			AtqRéuissie = joueurLancantAtq == Objectif;
+			AtqRéuissie = joueurLancantAtq == IdDefendant;
 			JoueurSeDéfendant = IdDefendant;
 			if (!AtqRéuissie)
 				AtqRéuissie = NombreDeUnits >= 20;

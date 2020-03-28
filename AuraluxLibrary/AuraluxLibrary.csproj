@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AList.cs" />
     <Compile Include="AttackInfo.cs" />
     <Compile Include="EventEntity.cs" />
     <Compile Include="GameState.cs" />

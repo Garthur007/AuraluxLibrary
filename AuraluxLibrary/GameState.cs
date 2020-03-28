@@ -8,110 +8,95 @@ namespace AuraluxLibrary
 {
 	public class GameState
 	{
-		
-
-
-		public Player[] listeDesJoueurs;
-		public Planète[] listeDesPlanètes;
-		public Planète[] planètesNeutres;
+		const int NBP = 5;
+		public List<Player> listeDesJoueurs;
+		public List<Planète> listeDesPlanètes;
+		public List<Planète> planètesNeutres;
 
 		public List<AttackInfo> listeDesAttaques;
 
-		public Player[] ListeDesJoueurs { get { return listeDesJoueurs; } set { listeDesJoueurs = value; } }
-		public Planète[] ListeDesPlanètes { get { return listeDesPlanètes; } set { listeDesPlanètes = value; } }
-		public Planète[] PlanètesNeutres { get { return planètesNeutres; } set { planètesNeutres = value; } }
+		public List<Player> ListeDesJoueurs { get { return listeDesJoueurs; } set { listeDesJoueurs = value; } }
+		public List<Planète> ListeDesPlanètes { get { return listeDesPlanètes; } set { listeDesPlanètes = value; } }
+		public List<Planète> PlanètesNeutres { get { return planètesNeutres; } set { planètesNeutres = value; } }
 
 		public List<AttackInfo> ListeDesAttaques { get { return listeDesAttaques; } set { listeDesAttaques = value; } }
-		public GameState(int nombreDeJoueur, int nombreDePlanètes,
-			List<Player> listeDesJoueurs, List<Planète> lPLanètes)
+		
+		public GameState(List<Player> lDesJoueurs, List<Planète> lPLanètes)
 		{
-			if (nombreDeJoueur == listeDesJoueurs.Count() && nombreDePlanètes == lPLanètes.Count())
-			{
-				ListeDesJoueurs = new Player[nombreDeJoueur];
-				ListeDesPlanètes = new Planète[nombreDePlanètes];
-				UpdateGameState(listeDesJoueurs, lPLanètes);
-			}
+			ListeDesJoueurs = new List<Player>();
+			foreach (Player p in lDesJoueurs)
+				ListeDesJoueurs.Add(p);
 
+			ListeDesPlanètes = new List<Planète>();
+			foreach (Planète p in lPLanètes)
+				ListeDesPlanètes.Add(p);
+
+			PlanètesNeutres = new List<Planète>();
+			foreach (Planète p in ListeDesPlanètes)
+				if (p.EstNeutre)
+					PlanètesNeutres.Add(p);
 		}
 
-		public  bool GameOver() => PlanètesNeutres.Count() == 0;
+
+		public bool GameOver(){
+			///
+			return listeDesJoueurs[0].ListeDePlanètesControllées.Count == 5||
+				 listeDesJoueurs[1].ListeDePlanètesControllées.Count == 5 || listeDesJoueurs[0].ListeDePlanètesControllées.Count == 0 ||
+				 listeDesJoueurs[1].ListeDePlanètesControllées.Count == 0;
+
+		}
 		public int Score(Player a)
 		{
 			if (!GameOver())
 				return 0;
-			string winnerID = "";
-			int score = -10;
-			foreach(Player p in ListeDesJoueurs)
-			{
-				if(p.ListeDePlanètesControllées.Count() == listeDesPlanètes.Length)
-				{
-					winnerID = p.ID;
-					break;
-				}	
-			}
-			if (winnerID == a.ID)
-				score = 10;
-			return score;
+
+			if (a.ListeDePlanètesControllées.Count == listeDesPlanètes.Count)
+				return 10;
+			else
+				return -10;
 		}
 
-		public void UpdateGameState(List<Player> listeDesJoueurs, List<Planète> lPLanètes)
-		{//Liste de tous les joeurs actifs du jeu
-			
-			for (int i = 0; i < ListeDesJoueurs.Length; ++i)
-				ListeDesJoueurs[i] = listeDesJoueurs[i];
 
-
-			//Liste de toutes les planètes du jeu
-			
-			for (int i = 0; i < ListeDesPlanètes.Length; ++i)
-				ListeDesPlanètes[i] = lPLanètes[i];
-
-			//Liste de toutes les planètes neutres
-			var pNeutres = ListeDesPlanètes.Where(e => e.EstNeutre == true).ToList();
-			PlanètesNeutres = new Planète[pNeutres.Count()];
-			for (int i = 0; i < pNeutres.Count(); ++i)
-				PlanètesNeutres[i] = pNeutres.ElementAt(i);
-		}
 		public static GameState NextState(GameState gs, List<AttackInfo> attaques)
 		{
-
 			int nbJ = gs.listeDesJoueurs.Count();
 			int nbP = gs.listeDesPlanètes.Count();
 			//Copy
 			var nJ = new List<Player>();
 			foreach (Player p in gs.ListeDesJoueurs)
 				nJ.Add(p);
+
 			var nP = new List<Planète>();
 			foreach (Planète p in gs.ListeDesPlanètes)
 				nP.Add(p);
 
 			//Ici on applique les changements causés au jeu suite aux attaques lancer par les joeurs;
-			var planètesTemporaire = gs.ListeDesPlanètes.Clone();
+			var planètesTemporaire = gs.ListeDesPlanètes;
 
 			foreach(AttackInfo atq in attaques)
 				if(!atq.SelfAtq)
-					for(int i = 0; i < gs.listeDesJoueurs.Length; ++i)
-						if (atq.JoueurLancantAtq == gs.ListeDesJoueurs[i].ID)
+					for(int i = 0; i < nbJ; ++i)
+						if (atq.JoueurLancantAtq == gs.ListeDesJoueurs[i].ID && atq.AtqRéuissie)
 						{
 							//On a trouvé quel joeur avait lancé l'attaque.
-							if (atq.AtqRéuissie)
-							{
-								var planèteSubissantAtq = nP.Find(e => e.Id == atq.objectif);
-								var nouvelÉtatPlanet = planèteSubissantAtq;
+							var planèteSubissantAtq = nP.Find(e => e.Id == atq.objectif);
+							var nouvelÉtatPlanet = planèteSubissantAtq;
+							nouvelÉtatPlanet.EstNeutre = false;
 								
 
-								nP.Remove(planèteSubissantAtq);
+							nP.Remove(planèteSubissantAtq);
 								//Pour le joueur lancant l'attaque
 								var a = nJ.ElementAt(i);
-								nJ.Remove(a);
+							
+								a.ListeDePlanètesControllées.Add(nouvelÉtatPlanet);
+								nJ.RemoveAt(i);
 								var nouvelÉtatDuJoueur = new Player(a.ID,a.ListeDePlanètesControllées);
 								nouvelÉtatDuJoueur.ListeDePlanètesControllées.Add(planèteSubissantAtq);
-								/////////////////////////////
-								nouvelÉtatPlanet.EstNeutre = false;
-								nouvelÉtatPlanet.JoueurEnContrôle = a.ID;
+							/////////////////////////////
+							nouvelÉtatPlanet.JoueurEnContrôle = a.ID;
 
-								//Pour le joueur qui se fait attaquer
-								var def = nJ.Find(e => e.ID == atq.JoueurSeDéfendant);
+							//Pour le joueur qui se fait attaquer
+							var def = nJ.Find(e => e.ID == atq.JoueurSeDéfendant);
 
 								var nouvelÉtatDuJoueur2 = new Player(def.ID, def.ListeDePlanètesControllées);
 								nouvelÉtatDuJoueur.ListeDePlanètesControllées.Remove(planèteSubissantAtq);
@@ -119,15 +104,14 @@ namespace AuraluxLibrary
 								//Pour les planètes
 
 								nP.Add(nouvelÉtatPlanet);
-							}
+							
 							break;
 						}
 			
-			GameState next = new GameState(nbJ, nbP, nJ, nP);
-			return next;
+			return new GameState(nJ, nP);
+			//return new GameState(nbJ, nbP, gs.listeDesJoueurs, gs.listeDesPlanètes);
 		}
+	
+		
 	}
-	
-	
-
 }

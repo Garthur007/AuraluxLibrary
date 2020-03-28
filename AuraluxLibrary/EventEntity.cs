@@ -57,9 +57,13 @@ namespace AuraluxLibrary
 		public int niveauActuel;
 		public int nbDePtsAvantProchainNiveau;
 		public int niveauMax;
+		public bool maxOut;
 
-
-
+		public bool MaxOut
+		{
+			get { return maxOut; }
+			set { estNeutre = NiveauMax == NiveauActuel && NiveauDeSanté == MaxNiveauDeSanté;  }
+		}
 		public bool EstNeutre
 		{
 			get { return estNeutre; }
