@@ -46,7 +46,9 @@
     <Compile Include="EventEntity.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="Planète.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Player.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Soldat.cs" />
   </ItemGroup>

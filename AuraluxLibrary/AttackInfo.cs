@@ -8,12 +8,12 @@ namespace AuraluxLibrary
 {
 	public class AttackInfo
 	{
-		public string joueurLancantAtq;
-		public string objectif;
-		public int nombreDeUnits;
-		public bool atqRéussie;
-		public bool selfAtq;
-		public string joueurSeDéfendant;
+		private string joueurLancantAtq;
+		private string objectif;
+		private int nombreDeUnits;
+		private bool atqRéussie;
+		private bool selfAtq;
+		private string joueurSeDéfendant;
 
 		public string JoueurLancantAtq { get { return joueurLancantAtq; } set { joueurLancantAtq = value; } }
 		public string JoueurSeDéfendant { get { return joueurSeDéfendant; } set { joueurSeDéfendant = value; } }
@@ -33,6 +33,10 @@ namespace AuraluxLibrary
 			JoueurSeDéfendant = IdDefendant;
 			if (!AtqRéuissie)
 				AtqRéuissie = NombreDeUnits >= 20;
+		}
+		public AttackInfo()
+		{
+
 		}
 	}
 }

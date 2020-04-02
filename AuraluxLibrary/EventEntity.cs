@@ -216,6 +216,7 @@ namespace AuraluxLibrary
 
 		}
 		public void ToggleConquérable() => Conquérable = !Conquérable;
+	
 		
     }
 }

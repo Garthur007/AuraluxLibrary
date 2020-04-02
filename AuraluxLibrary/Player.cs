@@ -24,7 +24,18 @@ namespace AuraluxLibrary
 		{
 			ID = id;
 			NbSoldats = 0;
-			ListeDePlanètesControllées = p;
+			ListeDePlanètesControllées = p;// new List<Planète>();
+			//foreach (Planète x in p)
+				//ListeDePlanètesControllées.Add(x.Clone());
+		}
+		public Player Clone()
+		{
+			var idClone = this.ID;
+			var listeDePlanètsClone = new List<Planète>();
+			foreach(Planète p in this.ListeDePlanètesControllées)
+				listeDePlanètsClone.Add(p.Clone());
+			
+			return new Player(idClone, listeDePlanètsClone);
 		}
 	}
 }
