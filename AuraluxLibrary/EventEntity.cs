@@ -41,9 +41,9 @@ namespace AuraluxLibrary
 		public EventHandler<UpradeLevelArgs> OnUpdrade;
 		public EventHandler<NeutreArgs> OnDevientNeutre;
 
-
+		
 	
-		public bool estNeutre;
+		private bool estNeutre;
 		public bool seFaitAttaquer;
 		public bool conquérable;
 		public string id;
@@ -106,9 +106,9 @@ namespace AuraluxLibrary
 		}
 		
 		
-		private int NbDeSoldatParGénération
+		public int NbDeSoldatParGénération
 		{
-			get { return nbDeSoldatParGénération; }
+			get { return (NiveauActuel + 1) * 10; }
 			set
 			{
 				nbDeSoldatParGénération = (NiveauActuel + 1) * 10;
@@ -129,7 +129,17 @@ namespace AuraluxLibrary
 			}
 
 		}
-		private int NbDePtsAvantProchainNiveau { get { return nbDePtsAvantProchainNiveau; } set { NbDePtsAvantProchainNiveau = value; } } //Le nombre de points avant d'atteindre le prochain niveau
+		private int NbDePtsAvantProchainNiveau { 
+			get { return nbDePtsAvantProchainNiveau; } 
+			set {
+				nbDePtsAvantProchainNiveau = value;
+				if (nbDePtsAvantProchainNiveau <= 0)
+				{
+					nbDePtsAvantProchainNiveau = 0;
+					IncrémenterNiveau();
+				}
+			} 
+		} //Le nombre de points avant d'atteindre le prochain niveau
 		private int NiveauMax { get { return niveauMax; } set { niveauMax = 3; } } //Le niveau maximal
 
 		public void GénérerSoldats()
@@ -143,23 +153,16 @@ namespace AuraluxLibrary
 		//Cette méthode s'assure que le niveau actuel ne dépasse pas le niveau maximal
 		public void IncrémenterNiveau()
 		{
-			nbDePtsAvantProchainNiveau += (niveauActuel + 2)* 500;
-			NiveauActuel = NiveauActuel < NiveauMax ? NiveauActuel + 1 : NiveauActuel;
+			NbDePtsAvantProchainNiveau += (NiveauActuel + 2)* 200;
+			NiveauActuel++; //= NiveauActuel < NiveauMax ? NiveauActuel++ : NiveauActuel;
 			OnUpdrade?.Invoke(this, new UpradeLevelArgs() { Message = "Niveau supérieur", nouveauNiveau = NiveauActuel });
 		}
 		public void AutoGuérison()
 		{
 			if(niveauDeSanté < maxNiveauDeSanté)
-			{
 				niveauDeSanté++;
-			}else if (nbDePtsAvantProchainNiveau > 0)
-			{
-				nbDePtsAvantProchainNiveau--;
-			}
 			else
-			{
-				IncrémenterNiveau();
-			}
+				NbDePtsAvantProchainNiveau--;
 		}
 
 
@@ -186,9 +189,9 @@ namespace AuraluxLibrary
 		public EventEntiy()
 		{
 
-			
+			EstNeutre = true;
 			SeFaitAttaquer = false;
-			nbDeSoldatParGénération = 5;
+			nbDeSoldatParGénération = 10;
 			Conquérable = true;
 			NiveauDeSanté = 100;
 			maxNiveauDeSanté = 100;

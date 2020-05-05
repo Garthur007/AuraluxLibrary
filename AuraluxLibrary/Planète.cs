@@ -12,10 +12,6 @@ namespace AuraluxLibrary
 	public class Planète : EventEntiy
 	{
 	
-		public int Rayon
-		{
-			get;set;
-		}
 		public Planète() : base()
 		{
 			
@@ -36,16 +32,23 @@ namespace AuraluxLibrary
 			int niveauMaxClone = niveauMax;
 			bool maxOutClone = maxOut;
 
+			bool b = false;
+			if (EstNeutre == true)
+				b = true;
+			else
+				b = false;
+
+
 			var copie = new Planète();
-			copie.EstNeutre = neutreC;
+			copie.EstNeutre = b;
 			copie.SeFaitAttaquer = seFaitAtqC;
-			copie.Id = idClone;
-			copie.idDuPropriétaire = idOwnerClone;
+			copie.Id = this.Id;
+			copie.idDuPropriétaire = this.idDuPropriétaire;
 			copie.NiveauDeSanté = niveauDeSClone;
 			copie.NbDeSoldats = nbSoldatsClone;
 			copie.nbDeSoldatParGénération = nbSoldatsParGénérationClone;
 			copie.nbDeSoldatsPourConquérir = nbDeSoldatsPourConquérirClone;
-			copie.nbPts = nbPtsClone;
+			copie.nbPts = this.nbPts;
 			copie.NiveauActuel = niveauActuelClone;
 			copie.nbDePtsAvantProchainNiveau = nbDePtsAvantProchainNiveauClone;
 			copie.niveauMax = niveauMaxClone;

@@ -17,19 +17,19 @@ namespace AuraluxLibrary
 		
 		public GameState(List<Player> lDesJoueurs, List<Planète> lPLanètes)
 		{
-			ListeDesJoueurs = new List<Player>();
-			ListeDesPlanètes = new List<Planète>();
-
+			ListeDesJoueurs = new List<Player>(lDesJoueurs);
+			ListeDesPlanètes = new List<Planète>(lPLanètes);
+			/*
 			foreach (Player p in lDesJoueurs)
 				ListeDesJoueurs.Add(p.Clone());
 
 			foreach (Planète p in lPLanètes)
-				ListeDesPlanètes.Add(p.Clone());
-		
+				ListeDesPlanètes.Add(p.Clone());*/
 		}
 
-
-		public bool GameOver() => listeDesJoueurs[0].ListeDePlanètesControllées.Count == 5 ||
+		
+		public bool GameOver() =>
+			listeDesJoueurs[0].ListeDePlanètesControllées.Count == 5 ||
 			listeDesJoueurs[1].ListeDePlanètesControllées.Count == 5;
 		public int Score(Player a)
 		{
@@ -44,33 +44,55 @@ namespace AuraluxLibrary
 
 		public static GameState NextState(GameState gs, AttackInfo atq)
 		{
-			GameState nextGameState = new GameState(gs.ListeDesJoueurs, gs.ListeDesPlanètes);
+			bool selfAttack = atq.SelfAtq;
+			
 
-			List<Player> listeJoueur = nextGameState.ListeDesJoueurs;
-			List<Planète> listePlanète = nextGameState.ListeDesPlanètes;
+
+			if (atq.JoueurLancantAtq == "" || atq.JoueurLancantAtq == null)
+				return new GameState(gs.ListeDesJoueurs, gs.ListeDesPlanètes);
+
+			List<Player> listeJoueur = new List<Player>();
+			List<Planète> listePlanète = new List<Planète>(gs.listeDesPlanètes);
+
+			foreach (Player p in gs.ListeDesJoueurs)
+				listeJoueur.Add(p.Clone());
+			//foreach (Planète p in gs.listeDesPlanètes)
+			//listePlanète.Add(p.Clone());
+
+
+			
 
 			Player joueurAttackant = listeJoueur.Find(player => player.ID == atq.JoueurLancantAtq);
 			Player joueurDef = listeJoueur.Find(player => player.ID == atq.JoueurSeDéfendant);
 
-			Planète planèteSubissantAtq = listePlanète.Find(planet => planet.Id == atq.Objectif);
-			Planète planèteSubissantAtq2 = joueurDef.ListeDePlanètesControllées.Find(planet => planet.Id == atq.Objectif);
+			Planète planèteSubissantAtq = listePlanète.Find(planet => planet.Id == atq.PlanèteCible);
+			Planète planèteSubissantAtq2 = joueurDef.ListeDePlanètesControllées.Find(planet => planet.Id == atq.PlanèteCible);
+			Planète planèteSubissantAtq3 = joueurAttackant.ListeDePlanètesControllées.Find(planet => planet.Id == atq.PlanèteCible);
 
-			if(atq.AtqRéuissie && !atq.SelfAtq)
+			if (selfAttack)
 			{
+				//joueurAttackant.ListeDePlanètesControllées.Remove(planèteSubissantAtq3);
+				int nombreDeSoldatPourATK = atq.NombreDeUnits;
+				for(int i = 0; i< nombreDeSoldatPourATK; ++i)
+				{
+					joueurAttackant.ListeDePlanètesControllées.Find(planet => planet.Id == atq.PlanèteCible).AutoGuérison();
+				}
+			}
+
+			if(!atq.SelfAtq)
+			{
+				if (!planèteSubissantAtq.EstNeutre)
+					joueurDef.ListeDePlanètesControllées.Remove(planèteSubissantAtq2);
 				planèteSubissantAtq.EstNeutre = false;
 				planèteSubissantAtq.idDuPropriétaire = joueurAttackant.ID;
 				joueurAttackant.ListeDePlanètesControllées.Add(planèteSubissantAtq);
-				
-				if(joueurDef.ListeDePlanètesControllées.Exists(planet => planet.Id == atq.Objectif))
+				if(joueurDef.ListeDePlanètesControllées.Exists(planet => planet.Id == atq.PlanèteCible))
 				{
-					joueurDef.ListeDePlanètesControllées.RemoveAll(planet => planet.Id == atq.Objectif);
+					joueurDef.ListeDePlanètesControllées.RemoveAll(planet => planet.Id == atq.PlanèteCible);
 				}
-
-
 			}
-
-
-			return nextGameState;
+			
+			return new GameState(listeJoueur, listePlanète);
 		}
 	}
 }

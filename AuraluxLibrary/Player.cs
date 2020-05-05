@@ -34,7 +34,9 @@ namespace AuraluxLibrary
 			var listeDePlanètsClone = new List<Planète>();
 			foreach(Planète p in this.ListeDePlanètesControllées)
 				listeDePlanètsClone.Add(p.Clone());
-			
+			foreach (Planète p in listeDePlanètsClone)
+				p.EstNeutre = false;
+
 			return new Player(idClone, listeDePlanètsClone);
 		}
 	}
