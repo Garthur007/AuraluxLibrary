@@ -52,9 +52,9 @@ namespace AuraluxLibrary
 		{
 			if (Stop) return;
 
-			if (temporaryRootNode.n == 0)
+			if (temporaryRootNode.N == 0)
 			{
-				temporaryRootNode.t += GameSimulation(temporaryRootNode.NodeGameState, 0);
+				temporaryRootNode.T += GameSimulation(temporaryRootNode.NodeGameState, 0);
 				BackPropagation(temporaryRootNode);
 			}
 			else
@@ -68,14 +68,14 @@ namespace AuraluxLibrary
 				return;
 			else
 			{
-				a.ParentNode.t += a.t;
-				a.ParentNode.n++;
+				a.ParentNode.T += a.T;
+				a.ParentNode.N++;
 				BackPropagation(a.ParentNode);
 			}
 		}
 		public void ExplorerNode(Node t)
 		{
-			a.ParentNode == null
+			if (Stop) return;
 
 			if (t == null)
 				throw new ArgumentNullException("t n'existe pas");

@@ -43,7 +43,7 @@ namespace AuraluxLibrary
 
 		
 	
-		private bool estNeutre;
+		public bool estNeutre;
 		public bool seFaitAttaquer;
 		public bool conquérable;
 		public string id;
@@ -119,7 +119,7 @@ namespace AuraluxLibrary
 		public int MaxNiveauDeSanté { get { return maxNiveauDeSanté; } private set { maxNiveauDeSanté = value * (niveauActuel+1); } } //Le niveau de santé maximal selon le niveau de la planète
 		public bool Conquérable { get { return conquérable; } private set { conquérable = value; } }  //Est-ce que la planète est conquérable ou non?
 		public int NbDeSoldatsPourConquérir { get { return nbDeSoldatsPourConquérir; } set { nbDeSoldatsPourConquérir = value; } }  //Le nombre de soldats ennemis néccessaire pour conquérir la planète
-		private int NbPoint { get { return nbPts; } set { nbPts = value; } }  //Le nombre de point actuel
+		public int NbPoint { get { return nbPts; } set { nbPts = value; } }  //Le nombre de point actuel
 		public int NiveauActuel //Le niveau actuel
 		{
 			get { return niveauActuel; }
@@ -129,7 +129,7 @@ namespace AuraluxLibrary
 			}
 
 		}
-		private int NbDePtsAvantProchainNiveau { 
+		public int NbDePtsAvantProchainNiveau { 
 			get { return nbDePtsAvantProchainNiveau; } 
 			set {
 				nbDePtsAvantProchainNiveau = value;
@@ -140,7 +140,7 @@ namespace AuraluxLibrary
 				}
 			} 
 		} //Le nombre de points avant d'atteindre le prochain niveau
-		private int NiveauMax { get { return niveauMax; } set { niveauMax = 3; } } //Le niveau maximal
+		public int NiveauMax { get { return niveauMax; } set { niveauMax = 3; } } //Le niveau maximal
 
 		public void GénérerSoldats()
 		{

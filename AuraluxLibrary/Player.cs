@@ -8,7 +8,7 @@ namespace AuraluxLibrary
 {
 	public class Player
 	{
-		 string id;
+		string id;
 		int nbSoldats;
 		int nbPlanèteContrôlée;
 

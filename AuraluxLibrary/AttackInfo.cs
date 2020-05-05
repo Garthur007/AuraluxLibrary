@@ -8,6 +8,7 @@ namespace AuraluxLibrary
 {
 	public class AttackInfo
 	{
+
 		private string joueurLancantAtq;  
 		private string planèteCible;
 		private int nombreDeUnits;
