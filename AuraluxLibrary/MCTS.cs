@@ -8,139 +8,185 @@ namespace AuraluxLibrary
 {
 	public class MCTS
 	{
-		public bool Stop { get; set; }
+		int nb = 0;
+		public  Random generateur;
+		public Random Generateur { get { return generateur; } set { generateur = value; } }
+		public bool Stop { get { return nb >= 100; } }
 
 		public Node rootNode;
 		public Node RootNode { get { return rootNode; } set { rootNode = value; } }
 
-		public MCTS(GameState gs)
+		public MCTS(GameStateMCTS gs)
 		{
-			Stop = false;
 			rootNode = new Node(gs);
+			Generateur = new Random();
 		}
 		/**  Actions
 		 * Attaquer planète neutre, planète ennemi
 		 * Attendre
 		 * S'upgrade
 		 * */
+		
 
-	
-		public Node Greatest_UCB1(Node n)
-		{
-			if (Stop)
-				return null;
-			double greatestValue = n.ChildNodes[0].UCB1(0);
-			Node nodeToReturn = n.ChildNodes[0];
-			for (int i = 1; i < 2; ++i) 
-				if (n.ChildNodes[i].UCB1(0)>greatestValue)
-				{
-					greatestValue = n.ChildNodes[i].UCB1(0);
-					nodeToReturn = n.ChildNodes[i];
-				}
-			return nodeToReturn;
-		}
+	   public Node Greatest_UCB1(Node n)
+	   {
+		   if (Stop) return null;
 
-		public void Execution(Node rNode)
-		{
-			if (Stop) return;
-				
-			ExplorerNode(rNode);
-			var highestUCB1Node = Greatest_UCB1(rNode);
-			Iterate(highestUCB1Node);
-		}
-		public void Iterate(Node temporaryRootNode)
-		{
-			if (Stop) return;
+			double greatestValue = n.ChildNodes[0].UCB1;
+		   Node nodeToReturn = n.ChildNodes[0];
+		   for (int i = 1; i < 2; ++i) 
+			   if (n.ChildNodes[i].UCB1>greatestValue)
+			   {
+				   greatestValue = n.ChildNodes[i].UCB1;
+				   nodeToReturn = n.ChildNodes[i];
+			   }
+		   return nodeToReturn;
+	   }
+	   public void Execution(Node rNode)
+	   {
+			nb++;
+		   if (Stop) return;
 
-			if (temporaryRootNode.N == 0)
-			{
-				temporaryRootNode.T += GameSimulation(temporaryRootNode.NodeGameState, 0);
+		   ExplorerNode(rNode);
+		   var highestUCB1Node = Greatest_UCB1(rNode);
+		   Iterate(highestUCB1Node);
+	   }
+	   public void Iterate(Node temporaryRootNode)
+	   {
+		   if (Stop) return;
+
+			
+		   if (temporaryRootNode.N == 0)
+		   {
+			   temporaryRootNode.T += GameSimulation(temporaryRootNode.NodeGameState, 0);
+				temporaryRootNode.N++;
 				BackPropagation(temporaryRootNode);
+				Execution(RootNode);
 			}
 			else
 			{
-				//Execution(temporaryRootNode);
+				Execution(temporaryRootNode);
 			}
-		}
-		public void BackPropagation(Node a)
+		   
+	   }
+	   public void BackPropagation(Node a)
+	   {
+		   if (Stop || a.ParentNode == null)
+			   return;
+		   else
+		   {
+			   a.ParentNode.T += a.T;
+			   a.ParentNode.N++;
+			   BackPropagation(a.ParentNode);
+		   }
+	   }
+	   public void ExplorerNode(Node t)
+	   {
+		   if (Stop) return;
+
+		   var gs = t.NodeGameState;
+		   var planètesNeutres = gs.ListeDesPlanètes.Where(p => p.EstNeutre);
+		   var jA = gs.ListeDesJoueurs.Find(j => j.Id == "EnemyTag");
+
+		   string idPlanèteToAttack = planètesNeutres.Count() == 0 ? gs.ListeDesJoueurs[1].PlanètesControllées.ElementAt(0) :
+			   planètesNeutres.ElementAt(0).Id;
+
+		   var childGameState1 = GameStateMCTS.NextGameState(gs,
+			   new AttackInfo("EnemyTag", jA.NbSoldats, idPlanèteToAttack, "Player"));
+
+		   var childGameState2 = GameStateMCTS.NextGameState(gs,
+			   new AttackInfo("EnemyTag", jA.NbSoldats, jA.PlanètesControllées.Where(a => gs.ListeDesPlanètes.Find(x => x.Id == a).Niveau < 4).ElementAt(0), "EnemyTag"));
+
+		   var childGameState3 = GameStateMCTS.NextGameState(gs,
+			   new AttackInfo(null, 0,null,null));
+
+		   Node childNodeA = new Node(childGameState1);
+		   Node childNodeB = new Node(childGameState2);
+		   Node childNodeC = new Node(childGameState3);
+
+		   t.Add_Child(childNodeA);
+		   childNodeA.ParentNode = t;
+		   t.Add_Child(childNodeB);
+		   childNodeB.ParentNode = t;
+		   t.Add_Child(childNodeC);
+		   childNodeC.ParentNode = t;
+	   }
+		public int GameSimulation(GameStateMCTS gs, int n)
 		{
-			if (Stop || a.ParentNode == null)
-				return;
-			else
-			{
-				a.ParentNode.T += a.T;
-				a.ParentNode.N++;
-				BackPropagation(a.ParentNode);
-			}
-		}
-		public void ExplorerNode(Node t)
-		{
-			if (Stop) return;
 
-			if (t == null)
-				throw new ArgumentNullException("t n'existe pas");
+			int nbSoldatsPNeutre = 10;
+			int nbSoldatsPEnnemi = 20;
 
-			var gs = t.NodeGameState;
-			var planètesNeutres = gs.ListeDesPlanètes.Where(p => p.EstNeutre == true);
-			var jA = gs.ListeDesJoueurs.Find(j => j.ID == "EnemyTag");
-
-			string idPlanèteToAttack = planètesNeutres.Count() == 0 ? gs.ListeDesJoueurs[1].ListeDePlanètesControllées.ElementAt(0).Id :
-				planètesNeutres.ElementAt(0).Id;
-
-
-
-			var childGameState1 = GameState.NextState(gs,
-				new AttackInfo(jA.ID, jA.NbSoldats, idPlanèteToAttack, "Player"));
-			var childGameState2 = GameState.NextState(gs,
-				new AttackInfo(jA.ID, jA.NbSoldats, jA.ListeDePlanètesControllées.Where(a => a.MaxOut == false).ElementAt(0).Id, "Player"));
-			var childGameState3 = GameState.NextState(gs,
-				new AttackInfo());
-
-			Node childNodeA = new Node(childGameState1);
-
-			Node childNodeB = new Node(childGameState2);
-			Node childNodeC = new Node(childGameState3);
-
-			t.Add_Child(childNodeA);
-			childNodeA.ParentNode = t;
-			t.Add_Child(childNodeB);
-			childNodeB.ParentNode = t;
-			t.Add_Child(childNodeC);
-			childNodeC.ParentNode = t;
-		}
-		public int GameSimulation(GameState gs, int n)
-		{
-			if (Stop)
-				return 0;
 			var nn = n;
-			if (n >= 10) return -1; else nn++;
-			if (gs.GameOver()) return gs.Score(gs.ListeDesJoueurs[0]);
+			if (n >= 100) return -1; else nn++;
+			if (gs.IsGameOver(gs)) return gs.FinaleScore(gs);
 
-
-
-			AttackInfo atq = new AttackInfo();
 			var planètesNeutres = gs.ListeDesPlanètes.Where(p => p.EstNeutre == true);
-			int choix = new Random().Next(0, 3);
-			if (gs.ListeDesJoueurs[0].ListeDePlanètesControllées.Count != 0 && (n % 2 == 0 || gs.ListeDesJoueurs[1].ListeDePlanètesControllées.Count == 0))
-			{
-				if ((choix == 0 || planètesNeutres.Count() == 0) && gs.ListeDesJoueurs[1].ListeDePlanètesControllées.Count != 0)
-					atq = new AttackInfo("EnemyTag", 20, gs.ListeDesJoueurs[1].ListeDePlanètesControllées.ElementAt(0).Id, "Player");
-				else if ((choix == 1 || choix == 2 || gs.ListeDesJoueurs[1].ListeDePlanètesControllées.Count == 0) && planètesNeutres.Count() != 0)
-					atq = new AttackInfo("EnemyTag", 20, planètesNeutres.ElementAt(0).Id, "Player");
-				else
-					atq = new AttackInfo("EnemyTag", 20, gs.ListeDesJoueurs[0].ListeDePlanètesControllées.Where(a => a.MaxOut == false).ElementAt(0).Id, "EnemyTag");
-			}
-			if (gs.ListeDesJoueurs[1].ListeDePlanètesControllées.Count != 0 && (n % 2 != 0 || gs.ListeDesJoueurs[0].ListeDePlanètesControllées.Count == 0))
-			{
-				if ((choix == 0 || planètesNeutres.Count() == 0) && gs.ListeDesJoueurs[0].ListeDePlanètesControllées.Count != 0)
-					atq = new AttackInfo("Player", 20, gs.ListeDesJoueurs[0].ListeDePlanètesControllées.ElementAt(0).Id, "EnemyTag");
-				else if ((choix == 1 || choix == 2 || gs.ListeDesJoueurs[0].ListeDePlanètesControllées.Count == 0) && planètesNeutres.Count() != 0)
-					atq = new AttackInfo("Player", 25, planètesNeutres.ElementAt(0).Id, "EnemyTag");
-				//else
-				//atq = new AttackInfo(true, "Player", "Player", gs.ListeDesJoueurs[1].ListeDePlanètesControllées.Where(a => a.MaxOut == false).ElementAt(0).Id, 30);
-			}
+			int choix = Generateur.Next(0,4);
 
-			return GameSimulation(GameState.NextState(gs, atq), nn);
+
+
+			AttackInfo atq = new AttackInfo(null, 0, null, null);
+
+			if (n % 2 == 0 && gs.ListeDesJoueurs[0].PlanètesControllées.Count() != 0)
+			{
+				if (planètesNeutres.Count() == 0)
+				{
+
+					if (choix == 0 && gs.ListeDesJoueurs[0].NbSoldats >= 20)
+						atq = new AttackInfo("EnemyTag", nbSoldatsPEnnemi, gs.ListeDesJoueurs[1].PlanètesControllées.ElementAt(0), "Player");
+					else if (choix == 1 && gs.ListeDesJoueurs[0].NbSoldats >= 10)
+						atq = new AttackInfo("EnemyTag", nbSoldatsPNeutre, gs.ListeDesJoueurs[0].PlanètesControllées.Where(a => gs.ListeDesPlanètes.Find(x => x.Id == a).Niveau < 4).ElementAt(0), "EnemyTag");
+					else
+						atq = new AttackInfo(null, 0, null, null);
+				}
+				else
+				{
+					if (gs.ListeDesJoueurs[1].PlanètesControllées.Count() == 0 && gs.ListeDesJoueurs[0].NbSoldats >= 10)
+						atq = new AttackInfo("EnemyTag", nbSoldatsPNeutre, planètesNeutres.ElementAt(0).Id, "Player");
+					else
+					{
+						if (choix == 0 && gs.ListeDesJoueurs[0].NbSoldats >= 10) //Attaque d'une planète neutre
+							atq = new AttackInfo("EnemyTag", nbSoldatsPNeutre, planètesNeutres.ElementAt(0).Id, "Player");
+						else if (choix == 1) //Self upgrade
+							atq = new AttackInfo("EnemyTag", gs.ListeDesJoueurs[0].NbSoldats, gs.ListeDesJoueurs[0].PlanètesControllées.Where(a => gs.ListeDesPlanètes.Find(x => x.Id == a).Niveau < 4).ElementAt(0), "EnemyTag");
+						else if (choix == 2 && gs.ListeDesJoueurs[0].NbSoldats >= 20) //Attaque planète ennemi
+							atq = new AttackInfo("EnemyTag", nbSoldatsPEnnemi, gs.ListeDesJoueurs[1].PlanètesControllées.ElementAt(0), "Player");
+						else//On attent
+							atq = new AttackInfo(null, 0, null, null);//Debug.Log(".................................................");
+					}
+				}
+			}
+			else if (gs.ListeDesJoueurs[1].PlanètesControllées.Count() != 0)
+			{
+				if (planètesNeutres.Count() == 0)
+				{
+
+					if (choix == 0 && gs.ListeDesJoueurs[1].NbSoldats >= 20)
+						atq = new AttackInfo("Player", nbSoldatsPEnnemi, gs.ListeDesJoueurs[0].PlanètesControllées.ElementAt(0), "EnemyTag");
+					else if (choix == 1)
+						atq = new AttackInfo("Player", gs.ListeDesJoueurs[1].NbSoldats, gs.ListeDesJoueurs[1].PlanètesControllées.Where(a => gs.ListeDesPlanètes.Find(x => x.Id == a).Niveau < 4).ElementAt(0), "Player");
+					else
+						atq = new AttackInfo(null, 0, null, null);
+				}
+				else
+				{
+					if (gs.ListeDesJoueurs[0].PlanètesControllées.Count() == 0 && gs.ListeDesJoueurs[1].NbSoldats >= 10)
+						atq = new AttackInfo("Player", nbSoldatsPNeutre, planètesNeutres.ElementAt(0).Id, "EnemyTag");
+					else
+					{
+						if (choix == 0 && gs.ListeDesJoueurs[1].NbSoldats >= 10)
+							atq = new AttackInfo("Player", nbSoldatsPNeutre, planètesNeutres.ElementAt(0).Id, "EnemyTag");
+						else if (choix == 1)
+							atq = new AttackInfo("Player", gs.ListeDesJoueurs[1].NbSoldats, gs.ListeDesJoueurs[1].PlanètesControllées.Where(a => gs.ListeDesPlanètes.Find(x => x.Id == a).Niveau < 4).ElementAt(0), "Player");
+						else if (choix == 2 && gs.ListeDesJoueurs[1].NbSoldats >= 20)
+							atq = new AttackInfo("Player", nbSoldatsPEnnemi, gs.ListeDesJoueurs[0].PlanètesControllées.ElementAt(0), "EnemyTag");
+						else
+							atq = new AttackInfo(null, 0, null, null); //Debug.Log(".................................................");
+					}
+				}
+			}
+			return GameSimulation(GameStateMCTS.NextGameState(gs, atq), nn);
 		}
 	}
 }

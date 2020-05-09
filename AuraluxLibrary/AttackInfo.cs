@@ -30,6 +30,7 @@ namespace AuraluxLibrary
 			PlanèteCible = planèteCible;  //La cible de l'attaque
 			NombreDeUnits = nbSoldat;    //Nombre d'unité de l'attaque
 			SelfAtq = JoueurLancantAtq == JoueurSeDéfendant;
+			Attendre = JoueurLancantAtq == null || JoueurLancantAtq == "";
 		}
 		public AttackInfo()
 		{
