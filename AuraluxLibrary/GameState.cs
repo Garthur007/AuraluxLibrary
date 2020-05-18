@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace AuraluxLibrary
 {
+	//Classe pour l'état de jeu 
 	public class GameState
 	{
 		
@@ -45,6 +46,8 @@ namespace AuraluxLibrary
 	
 	}
 
+
+	//Toutes les classes qui finissent par MCTS sont exlusivement pour l'arbre de recherche de Monte Carlo
 	public class PlanèteMCTS
 	{
 		string id;
