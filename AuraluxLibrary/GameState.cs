@@ -21,11 +21,13 @@ namespace AuraluxLibrary
 			ListeDesPlanètes = new List<Planète>(lPLanètes);
 			
 		}
-
-		
-		public bool GameOver() =>
-			listeDesJoueurs[0].ListeDePlanètesControllées.Count == ListeDesPlanètes.Count() ||
-			listeDesJoueurs[1].ListeDePlanètesControllées.Count == ListeDesPlanètes.Count();
+		public bool GameOver()
+		{
+			for (int i = 1; i < ListeDesPlanètes.Count(); ++i)
+				if (ListeDesPlanètes.ElementAt(i-1).idDuPropriétaire != ListeDesPlanètes.ElementAt(i).idDuPropriétaire)
+					return false;
+			return true;
+		}
 		public int Score(Player a)
 		{
 			if (!GameOver()) return 0;
@@ -47,7 +49,7 @@ namespace AuraluxLibrary
 	{
 		string id;
 		string joueurEnControlle;
-		int niveau;
+		
 		int nbPts;
 
 
@@ -127,7 +129,6 @@ namespace AuraluxLibrary
 				return -10;
 
 		}
-
 
 		public static GameStateMCTS NextGameState(GameStateMCTS gs, AttackInfo a)
 		{
